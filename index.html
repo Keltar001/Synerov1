@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SYNERO - Compagnon de Combat</title>
+    <title>SYNERO - Gestionnaire de Héros</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -16,13 +16,41 @@
             -webkit-user-select: none;
         }
 
-        /* COMPTEUR DE PV (TOUT EN HAUT, AJUSTÉ AVEC LES RACCOURCIS 5) */
+        /* BARRE D'ONGLETS POUR LES HÉROS */
+        .tabs-container {
+            display: flex;
+            gap: 6px;
+            margin: 10px 0 15px 0;
+            justify-content: center;
+        }
+        .tab-btn {
+            flex: 1;
+            max-width: 90px;
+            padding: 10px 5px;
+            background-color: #26201b;
+            border: 1px solid #362e27;
+            color: #a89986;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 13px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s ease;
+        }
+        .tab-btn.active {
+            background-color: #4a1212;
+            color: #d4af37;
+            border-color: #d4af37;
+            box-shadow: 0 0 8px rgba(212, 175, 55, 0.3);
+        }
+
+        /* COMPTEUR DE PV DU HÉROS ACTIF */
         .hp-section {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            margin: 15px 0 25px 0;
+            margin: 5px 0 25px 0;
             background: linear-gradient(180deg, #2c1a1a 0%, #1a1613 100%);
             padding: 15px 10px;
             border-radius: 12px;
@@ -78,7 +106,7 @@
             justify-content: center;
         }
 
-        /* BLOC COMPTEUR MINIMALISTE [-] [ICONE] [+] */
+        /* BLOC COMPTEUR [-] [ICONE] [+] */
         .status-item {
             background-color: #26201b;
             padding: 6px 8px;
@@ -190,9 +218,17 @@
 </head>
 <body>
 
-    <!-- COMPTEUR DE PV DE L'ÉQUIPE (AVEC LES 4 BOUTONS DE COMMANDE) -->
+    <!-- BARRE DE SÉLECTION DU HÉROS -->
+    <div class="tabs-container">
+        <button class="tab-btn active" id="tab-hero1" onclick="changerHero('hero1', 'Héro 1')">Héro 1</button>
+        <button class="tab-btn" id="tab-hero2" onclick="changerHero('hero2', 'Héro 2')">Héro 2</button>
+        <button class="tab-btn" id="tab-hero3" onclick="changerHero('hero3', 'Héro 3')">Héro 3</button>
+        <button class="tab-btn" id="tab-hero4" onclick="changerHero('hero4', 'Héro 4')">Héro 4</button>
+    </div>
+
+    <!-- COMPTEUR DE PV DU HÉROS SÉLECTIONNÉ -->
     <div class="hp-section">
-        <div style="font-size: 11px; text-transform: uppercase; color: #a89986; margin-bottom: 8px; letter-spacing: 1px;">Points de Vie de l'Équipe</div>
+        <div id="hp-label" style="font-size: 14px; font-weight: bold; text-transform: uppercase; color: #d4af37; margin-bottom: 8px; letter-spacing: 1px;">Héro 1</div>
         <div class="hp-container">
             <button class="btn btn-hp btn-5-hp" onclick="modifierHP(-5)">-5</button>
             <button class="btn btn-hp btn-minus-hp" onclick="modifierHP(-1)">-</button>
@@ -215,12 +251,13 @@
 
     <!-- BARRE DE RESET -->
     <div class="reset-bar">
-        <button class="btn-reset" onclick="resetTousLesCompteurs()">Nouvelle Partie / Reset</button>
+        <button class="btn-reset" onclick="resetTousLesCompteurs()">Reset Tout (New Game)</button>
     </div>
 
     <script>
-        // LA LISTE COMPLÈTE DE VOS STATUS (ID ET IMAGES TEMPORAIRES)
-        // Astuce : Quand tes images seront prêtes, remplace l'émoji par : "<img src='mon-image.png' width='24'>"
+        // Variables de suivi global
+        let heroActif = 'hero1';
+
         const listeAuras = [
             { id: "heal", icon: "💚" },
             { id: "block", icon: "🛡️" },
@@ -268,7 +305,23 @@
             `;
         }
 
-        // Gestion des compteurs de statuts (0 à 9)
+        // Fonction de changement d'onglet (Héros 1 à 4)
+        function changerHero(idHero, nomAffichage) {
+            // Mise à jour visuelle des onglets
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`tab-${idHero}`).classList.add('active');
+
+            // Changement de l'étiquette des PV
+            document.getElementById('hp-label').innerText = nomAffichage;
+
+            // Changement de contexte de données
+            heroActif = idHero;
+
+            // Recharger l'affichage avec les données du nouveau héros sélectionné
+            chargerSauvegarde();
+        }
+
+        // Gestion des compteurs de statuts (0 à 9) - Indexés par héros
         function modifier(id, changement) {
             const display = document.getElementById(`val-${id}`);
             const card = document.getElementById(`item-${id}`);
@@ -285,44 +338,49 @@
                 card.classList.remove('active');
             }
 
-            localStorage.setItem(id, v);
+            // Clé unique par héros : ex "hero1_heal"
+            localStorage.setItem(`${heroActif}_${id}`, v);
         }
 
-        // Gestion spécifique des PV (Prise en compte des paliers de 1 ou 5)
+        // Gestion spécifique des PV - Indexés par héros
         function modifierHP(changement) {
             const display = document.getElementById('val-hp');
             let v = parseInt(display.innerText) + changement;
 
-            if (v < 0) v = 0; // Les PV ne tombent pas en dessous de zéro
+            if (v < 0) v = 0;
 
             display.innerText = v;
-            localStorage.setItem('team_hp', v);
+            localStorage.setItem(`${heroActif}_hp`, v);
         }
 
+        // Reset global (Vide la mémoire de TOUS les héros d'un coup)
         function resetTousLesCompteurs() {
-            if (confirm("Remettre les PV à 20 et effacer tous les statuts ?")) {
-                document.getElementById('val-hp').innerText = "20";
-                const badges = document.querySelectorAll('.status-badge');
-                badges.forEach(b => b.innerText = "0");
-                
-                const items = document.querySelectorAll('.status-item');
-                items.forEach(i => i.classList.remove('active'));
-                
+            if (confirm("Voulez-vous réinitialiser l'intégralité des 4 Héros à 20 PV et effacer leurs statuts ?")) {
                 localStorage.clear();
+                changerHero('hero1', 'Héro 1'); // Revient sur le héros 1 remis à neuf
             }
         }
 
+        // Charge les données spécifiques au héros actuellement actif
         function chargerSauvegarde() {
-            const savedHP = localStorage.getItem('team_hp');
-            if (savedHP) document.getElementById('val-hp').innerText = savedHP;
+            // Charger les PV du héros actif (20 par défaut si nouvelle partie)
+            const savedHP = localStorage.getItem(`${heroActif}_hp`);
+            document.getElementById('val-hp').innerText = savedHP ? savedHP : "20";
 
+            // Charger tous les statuts du héros actif (0 par défaut)
             const badges = document.querySelectorAll('.status-badge');
             badges.forEach(b => {
                 const id = b.id.replace('val-', '');
-                const savedVal = localStorage.getItem(id);
-                if (savedVal && parseInt(savedVal) > 0) {
-                    b.innerText = savedVal;
-                    document.getElementById(`item-${id}`).classList.add('active');
+                const savedVal = localStorage.getItem(`${heroActif}_${id}`);
+                const valeurNette = savedVal ? parseInt(savedVal) : 0;
+                
+                b.innerText = valeurNette;
+                
+                const card = document.getElementById(`item-${id}`);
+                if (valeurNette > 0) {
+                    card.classList.add('active');
+                } else {
+                    card.classList.remove('active');
                 }
             });
         }
