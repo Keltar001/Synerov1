@@ -11,7 +11,7 @@
             color: #f5f0eb;
             margin: 0;
             padding: 10px;
-            padding-bottom: 90px;
+            padding-bottom: 100px; /* Un peu plus d'espace en bas pour les 2 boutons */
             user-select: none;
             -webkit-user-select: none;
         }
@@ -44,7 +44,7 @@
             box-shadow: 0 0 8px rgba(212, 175, 55, 0.3);
         }
 
-        /* COMPTEUR DE PV DU HÉROS ACTIF */
+        /* COMPTEUR DE PV DU HÉROS SÉLECTIONNÉ */
         .hp-section {
             display: flex;
             flex-direction: column;
@@ -189,7 +189,7 @@
         .btn-plus-aura { background-color: #d4af37; color: #1a1613; }
         .btn-plus-curse { background-color: #8e44ad; color: #fff; }
 
-        /* BOUTON RESET FIXE */
+        /* DOUBLE BARRE DE RESET FIXE (AMÉLIORÉE) */
         .reset-bar {
             position: fixed;
             bottom: 0;
@@ -200,19 +200,27 @@
             box-shadow: 0 -5px 15px rgba(0,0,0,0.5);
             display: flex;
             justify-content: center;
+            gap: 10px; /* Espace entre les deux boutons */
         }
         .btn-reset {
-            background-color: #c0392b;
-            color: white;
+            flex: 1;
+            max-width: 160px;
             border: none;
-            padding: 10px 20px;
+            padding: 12px 5px;
             border-radius: 20px;
             font-weight: bold;
-            font-size: 12px;
+            font-size: 11px;
             cursor: pointer;
             text-transform: uppercase;
-            width: 100%;
-            max-width: 250px;
+            letter-spacing: 0.5px;
+            color: white;
+            text-align: center;
+        }
+        .btn-reset-hero {
+            background-color: #d35400; /* Orange terre pour un seul héros */
+        }
+        .btn-reset-all {
+            background-color: #c0392b; /* Rouge vif pour le reset total */
         }
     </style>
 </head>
@@ -249,13 +257,13 @@
     <div class="section-title title-curse">💀 Curses & Malus</div>
     <div class="status-grid" id="curses-container"></div>
 
-    <!-- BARRE DE RESET -->
+    <!-- BARRE DE REINITIALISATION DOUBLE -->
     <div class="reset-bar">
-        <button class="btn-reset" onclick="resetTousLesCompteurs()">Reset Tout (New Game)</button>
+        <button class="btn-reset btn-reset-hero" onclick="resetHeroActif()">Reset ce Héros</button>
+        <button class="btn-reset btn-reset-all" onclick="resetTousLesCompteurs()">Reset les 4 Héros</button>
     </div>
 
     <script>
-        // Variables de suivi global
         let heroActif = 'hero1';
 
         const listeAuras = [
@@ -305,23 +313,14 @@
             `;
         }
 
-        // Fonction de changement d'onglet (Héros 1 à 4)
         function changerHero(idHero, nomAffichage) {
-            // Mise à jour visuelle des onglets
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
             document.getElementById(`tab-${idHero}`).classList.add('active');
-
-            // Changement de l'étiquette des PV
             document.getElementById('hp-label').innerText = nomAffichage;
-
-            // Changement de contexte de données
             heroActif = idHero;
-
-            // Recharger l'affichage avec les données du nouveau héros sélectionné
             chargerSauvegarde();
         }
 
-        // Gestion des compteurs de statuts (0 à 9) - Indexés par héros
         function modifier(id, changement) {
             const display = document.getElementById(`val-${id}`);
             const card = document.getElementById(`item-${id}`);
@@ -338,11 +337,9 @@
                 card.classList.remove('active');
             }
 
-            // Clé unique par héros : ex "hero1_heal"
             localStorage.setItem(`${heroActif}_${id}`, v);
         }
 
-        // Gestion spécifique des PV - Indexés par héros
         function modifierHP(changement) {
             const display = document.getElementById('val-hp');
             let v = parseInt(display.innerText) + changement;
@@ -353,21 +350,32 @@
             localStorage.setItem(`${heroActif}_hp`, v);
         }
 
-        // Reset global (Vide la mémoire de TOUS les héros d'un coup)
-        function resetTousLesCompteurs() {
-            if (confirm("Voulez-vous réinitialiser l'intégralité des 4 Héros à 20 PV et effacer leurs statuts ?")) {
-                localStorage.clear();
-                changerHero('hero1', 'Héro 1'); // Revient sur le héros 1 remis à neuf
+        // NOUNEAU : Reset uniquement le héros de l'onglet actif
+        function resetHeroActif() {
+            const nomHero = document.getElementById(`tab-${heroActif}`).innerText;
+            if (confirm(`Réinitialiser uniquement les PV et statuts de : ${nomHero} ?`)) {
+                // Supprime la sauvegarde locale de ce héros précis
+                localStorage.removeItem(`${heroActif}_hp`);
+                listeAuras.forEach(item => localStorage.removeItem(`${heroActif}_${item.id}`));
+                listeCurses.forEach(item => localStorage.removeItem(`${heroActif}_${item.id}`));
+                
+                // Rafraîchit l'écran
+                chargerSauvegarde();
             }
         }
 
-        // Charge les données spécifiques au héros actuellement actif
+        // Reset global (Nettoie toute la table)
+        function resetTousLesCompteurs() {
+            if (confirm("Voulez-vous réinitialiser l'intégralité des 4 Héros (Effacement total) ?")) {
+                localStorage.clear();
+                changerHero('hero1', 'Héro 1');
+            }
+        }
+
         function chargerSauvegarde() {
-            // Charger les PV du héros actif (20 par défaut si nouvelle partie)
             const savedHP = localStorage.getItem(`${heroActif}_hp`);
             document.getElementById('val-hp').innerText = savedHP ? savedHP : "20";
 
-            // Charger tous les statuts du héros actif (0 par défaut)
             const badges = document.querySelectorAll('.status-badge');
             badges.forEach(b => {
                 const id = b.id.replace('val-', '');
