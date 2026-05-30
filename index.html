@@ -11,7 +11,7 @@
             color: #f5f0eb;
             margin: 0;
             padding: 10px;
-            padding-bottom: 100px; /* Un peu plus d'espace en bas pour les 2 boutons */
+            padding-bottom: 100px;
             user-select: none;
             -webkit-user-select: none;
         }
@@ -118,7 +118,7 @@
             border: 1px solid #362e27;
         }
 
-        /* ZONE ICONE + BADGE NUMÉRIQUE */
+        /* ZONE ICONE AJUSTÉE POUR ACCUEILLIR TES IMAGES PNG */
         .icon-wrapper {
             position: relative;
             width: 46px;
@@ -129,9 +129,14 @@
             justify-content: center;
             align-items: center;
             border: 1px solid #443a30;
+            overflow: visible;
         }
+        
+        /* Ajustement de la taille de tes images de cartes */
         .status-icon {
-            font-size: 24px; 
+            max-width: 34px;
+            max-height: 34px;
+            object-fit: contain; /* Évite de déformer ton graphisme */
         }
 
         /* Badge du chiffre posé sur l'icône */
@@ -150,6 +155,7 @@
             justify-content: center;
             align-items: center;
             border: 1px solid #1a1613;
+            z-index: 2;
         }
         
         /* Style quand le compteur est actif (> 0) */
@@ -189,7 +195,7 @@
         .btn-plus-aura { background-color: #d4af37; color: #1a1613; }
         .btn-plus-curse { background-color: #8e44ad; color: #fff; }
 
-        /* DOUBLE BARRE DE RESET FIXE (AMÉLIORÉE) */
+        /* DOUBLE BARRE DE RESET FIXE */
         .reset-bar {
             position: fixed;
             bottom: 0;
@@ -200,7 +206,7 @@
             box-shadow: 0 -5px 15px rgba(0,0,0,0.5);
             display: flex;
             justify-content: center;
-            gap: 10px; /* Espace entre les deux boutons */
+            gap: 10px;
         }
         .btn-reset {
             flex: 1;
@@ -216,17 +222,12 @@
             color: white;
             text-align: center;
         }
-        .btn-reset-hero {
-            background-color: #d35400; /* Orange terre pour un seul héros */
-        }
-        .btn-reset-all {
-            background-color: #c0392b; /* Rouge vif pour le reset total */
-        }
+        .btn-reset-hero { background-color: #d35400; }
+        .btn-reset-all { background-color: #c0392b; }
     </style>
 </head>
 <body>
 
-    <!-- BARRE DE SÉLECTION DU HÉROS -->
     <div class="tabs-container">
         <button class="tab-btn active" id="tab-hero1" onclick="changerHero('hero1', 'Héro 1')">Héro 1</button>
         <button class="tab-btn" id="tab-hero2" onclick="changerHero('hero2', 'Héro 2')">Héro 2</button>
@@ -234,7 +235,6 @@
         <button class="tab-btn" id="tab-hero4" onclick="changerHero('hero4', 'Héro 4')">Héro 4</button>
     </div>
 
-    <!-- COMPTEUR DE PV DU HÉROS SÉLECTIONNÉ -->
     <div class="hp-section">
         <div id="hp-label" style="font-size: 14px; font-weight: bold; text-transform: uppercase; color: #d4af37; margin-bottom: 8px; letter-spacing: 1px;">Héro 1</div>
         <div class="hp-container">
@@ -249,15 +249,12 @@
         </div>
     </div>
 
-    <!-- SECTION AURAS -->
     <div class="section-title title-aura">✨ Auras</div>
     <div class="status-grid" id="auras-container"></div>
 
-    <!-- SECTION CURSES -->
     <div class="section-title title-curse">💀 Curses & Malus</div>
     <div class="status-grid" id="curses-container"></div>
 
-    <!-- BARRE DE REINITIALISATION DOUBLE -->
     <div class="reset-bar">
         <button class="btn-reset btn-reset-hero" onclick="resetHeroActif()">Reset ce Héros</button>
         <button class="btn-reset btn-reset-all" onclick="resetTousLesCompteurs()">Reset les 4 Héros</button>
@@ -266,27 +263,16 @@
     <script>
         let heroActif = 'hero1';
 
+        // Base de données simplifiée (Le code va chercher directement "id.png")
         const listeAuras = [
-            { id: "heal", icon: "💚" },
-            { id: "block", icon: "🛡️" },
-            { id: "fury", icon: "🔥" },
-            { id: "sharp", icon: "⚔️" },
-            { id: "bless", icon: "✨" },
-            { id: "regen", icon: "🌿" },
-            { id: "melee", icon: "🤜" },
-            { id: "range", icon: "🏹" },
-            { id: "feu", icon: "💥" },
-            { id: "froid", icon: "❄️" },
-            { id: "holy", icon: "🌟" }
+            { id: "heal" }, { id: "block" }, { id: "fury" }, { id: "sharp" }, 
+            { id: "bless" }, { id: "regen" }, { id: "melee" }, { id: "range" }, 
+            { id: "feu" }, { id: "froid" }, { id: "holy" }
         ];
 
         const listeCurses = [
-            { id: "bleed", icon: "🩸" },
-            { id: "poison", icon: "🧪" },
-            { id: "sanctify", icon: "⏳" },
-            { id: "burn", icon: "♨️" },
-            { id: "chill", icon: "🥶" },
-            { id: "mark", icon: "🎯" }
+            { id: "bleed" }, { id: "poison" }, { id: "sanctify" }, 
+            { id: "burn" }, { id: "chill" }, { id: "mark" }
         ];
 
         function initialiserApplication() {
@@ -299,13 +285,14 @@
             chargerSauvegarde();
         }
 
+        // L'astuce magique : src="${item.id}.png" charge automatiquement ton image correspondante
         function creerCardHTML(item, type) {
             const plusClass = type === 'aura' ? 'btn-plus-aura' : 'btn-plus-curse';
             return `
                 <div class="status-item" id="item-${item.id}">
                     <button class="btn" onclick="modifier('${item.id}', -1)">-</button>
                     <div class="icon-wrapper">
-                        <span class="status-icon">${item.icon}</span>
+                        <img src="${item.id}.png" class="status-icon" alt="${item.id}">
                         <div class="status-badge" id="val-${item.id}">0</div>
                     </div>
                     <button class="btn ${plusClass}" onclick="modifier('${item.id}', 1)">+</button>
@@ -350,21 +337,16 @@
             localStorage.setItem(`${heroActif}_hp`, v);
         }
 
-        // NOUNEAU : Reset uniquement le héros de l'onglet actif
         function resetHeroActif() {
             const nomHero = document.getElementById(`tab-${heroActif}`).innerText;
             if (confirm(`Réinitialiser uniquement les PV et statuts de : ${nomHero} ?`)) {
-                // Supprime la sauvegarde locale de ce héros précis
                 localStorage.removeItem(`${heroActif}_hp`);
                 listeAuras.forEach(item => localStorage.removeItem(`${heroActif}_${item.id}`));
                 listeCurses.forEach(item => localStorage.removeItem(`${heroActif}_${item.id}`));
-                
-                // Rafraîchit l'écran
                 chargerSauvegarde();
             }
         }
 
-        // Reset global (Nettoie toute la table)
         function resetTousLesCompteurs() {
             if (confirm("Voulez-vous réinitialiser l'intégralité des 4 Héros (Effacement total) ?")) {
                 localStorage.clear();
