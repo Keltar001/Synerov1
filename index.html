@@ -3,118 +3,167 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SYNERO - Compteur Aura & Curse</title>
+    <title>SYNERO - Compagnon de Combat</title>
     <style>
-        /* Style général inspiré du jeu Synero */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #1a1613;
             color: #f5f0eb;
             margin: 0;
+            padding: 10px;
+            padding-bottom: 90px;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        /* COMPTEUR DE PV (TOUT EN HAUT & CENTRÉ) */
+        .hp-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 15px 0 25px 0;
+            background: linear-gradient(180deg, #2c1a1a 0%, #1a1613 100%);
             padding: 15px;
-            padding-bottom: 80px; /* Espace pour le bouton Reset fixe */
+            border-radius: 12px;
+            border: 1px solid #4a1212;
         }
-        h1 {
-            text-align: center;
-            color: #d4af37;
-            font-size: 24px;
-            margin-bottom: 5px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
+        .hp-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 25px;
         }
-        .subtitle {
-            text-align: center;
-            font-size: 12px;
-            color: #a89986;
-            margin-bottom: 20px;
+        .hp-display {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 36px;
+            font-weight: bold;
+            color: #ff4757;
+            text-shadow: 0 0 10px rgba(255, 71, 87, 0.3);
         }
+        .hp-heart {
+            font-size: 42px;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        /* TITRES DES SECTIONS */
         .section-title {
-            font-size: 18px;
-            border-bottom: 2px solid #4a1212;
-            padding-bottom: 5px;
-            margin-top: 25px;
-            margin-bottom: 15px;
+            font-size: 16px;
+            font-weight: bold;
             text-transform: uppercase;
             letter-spacing: 1px;
+            margin: 20px 0 10px 5px;
+            padding-left: 8px;
+            border-left: 3px solid #fff;
         }
-        .title-aura { color: #d4af37; border-color: #d4af37; }
-        .title-curse { color: #8e44ad; border-color: #8e44ad; }
+        .title-aura { color: #d4af37; border-left-color: #d4af37; }
+        .title-curse { color: #a870e6; border-left-color: #a870e6; }
 
-        /* Style des cartes de compteurs */
-        .counter-card {
-            background-color: #26201b;
-            border-radius: 8px;
-            padding: 12px 15px;
-            margin-bottom: 12px;
+        /* GRILLE DES STATUTS COMPACTE */
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1max));
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-            border-left: 5px solid #fff;
-        }
-        .card-aura { border-left-color: #d4af37; }
-        .card-curse { border-left-color: #8e44ad; }
-
-        .info-zone {
-            flex: 1;
-            padding-right: 10px;
-        }
-        .effect-name {
-            font-size: 15px;
-            font-weight: bold;
-            margin-bottom: 3px;
-        }
-        .effect-desc {
-            font-size: 11px;
-            color: #a89986;
-            line-height: 1.3;
-        }
-
-        /* Zone des boutons +/- */
-        .control-zone {
-            display: flex;
-            align-items: center;
+            flex-wrap: wrap;
             gap: 12px;
+            justify-content: center;
         }
-        .btn {
-            width: 40px;
-            height: 40px;
+
+        /* BLOC COMPTEUR MINIMALISTE [-] [ICONE] [+] */
+        .status-item {
+            background-color: #26201b;
+            padding: 8px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            border: 1px solid #362e27;
+        }
+
+        /* ZONE ICONE + BADGE NUMÉRIQUE */
+        .icon-wrapper {
+            position: relative;
+            width: 46px;
+            height: 46px;
+            background-color: #1a1613;
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 1px solid #443a30;
+        }
+        /* Pour l'instant on utilise des émojis, mais tu pourras mettre des <img src="..."> */
+        .status-icon {
+            font-size: 24px; 
+        }
+
+        /* Badge du chiffre posé sur l'icône */
+        .status-badge {
+            position: absolute;
+            bottom: -4px;
+            right: -4px;
+            background-color: #3d352e;
+            color: #a89986;
+            font-size: 12px;
+            font-weight: bold;
+            width: 18px;
+            height: 18px;
             border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 1px solid #1a1613;
+        }
+        /* Style quand le compteur est actif (> 0) */
+        .status-item.active .icon-wrapper {
+            border-color: #55efc4;
+            box-shadow: 0 0 8px rgba(85, 239, 196, 0.2);
+        }
+        .status-item.active .status-badge {
+            background-color: #55efc4;
+            color: #1a1613;
+        }
+
+        /* BOUTONS STYLE MANETTE / JEU */
+        .btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
             border: none;
-            font-size: 20px;
+            font-size: 16px;
             font-weight: bold;
             cursor: pointer;
             display: flex;
             justify-content: center;
             align-items: center;
-            transition: transform 0.1s;
-            user-select: none;
+            color: #fff;
+            background-color: #3a322b;
         }
         .btn:active { transform: scale(0.9); }
         
-        .btn-minus { background-color: #4a3e3d; color: #f5f0eb; }
+        /* Différenciation des boutons + */
+        .btn-plus-hp { background-color: #ff4757; color: white; width: 44px; height: 44px; font-size: 20px; border-radius: 50%; }
+        .btn-minus-hp { background-color: #4a2024; color: white; width: 44px; height: 44px; font-size: 20px; border-radius: 50%; }
+        
         .btn-plus-aura { background-color: #d4af37; color: #1a1613; }
         .btn-plus-curse { background-color: #8e44ad; color: #fff; }
 
-        .number-display {
-            font-size: 24px;
-            font-weight: bold;
-            width: 25px;
-            text-align: center;
-            color: #fff;
-        }
-        .number-display.active-val {
-            color: #55efc4; /* Alerte visuelle verte si le compteur est > 0 */
-        }
-
-        /* Bouton Reset tout en bas */
+        /* BOUTON RESET FIXE */
         .reset-bar {
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
             background-color: #1a1613;
-            padding: 15px;
+            padding: 12px;
             box-shadow: 0 -5px 15px rgba(0,0,0,0.5);
             display: flex;
             justify-content: center;
@@ -123,136 +172,153 @@
             background-color: #c0392b;
             color: white;
             border: none;
-            padding: 12px 30px;
-            border-radius: 25px;
+            padding: 10px 20px;
+            border-radius: 20px;
             font-weight: bold;
-            font-size: 14px;
+            font-size: 12px;
             cursor: pointer;
             text-transform: uppercase;
-            letter-spacing: 1px;
             width: 100%;
-            max-width: 300px;
+            max-width: 250px;
         }
     </style>
 </head>
 <body>
 
-    <h1>SYNERO</h1>
-    <div class="subtitle">Compagnon de Raid — Gestion des Statuts</div>
-
-    <div class="section-title title-aura">✨ Vos Auras</div>
-    <div id="auras-container">
+    <!-- COMPTEUR DE PV DE L'ÉQUIPE -->
+    <div class="hp-section">
+        <div style="font-size: 11px; text-transform: uppercase; color: #a89986; margin-bottom: 5px; letter-spacing: 1px;">Points de Vie de l'Équipe</div>
+        <div class="hp-container">
+            <button class="btn btn-minus-hp" onclick="modifierHP(-1)">-</button>
+            <div class="hp-display">
+                <span class="hp-heart">❤️</span>
+                <span id="val-hp">20</span>
+            </div>
+            <button class="btn btn-plus-hp" onclick="modifierHP(1)">+</button>
         </div>
+    </div>
 
-    <div class="section-title title-curse">💀 Vos Malus & Curses</div>
-    <div id="curses-container">
-        </div>
+    <!-- SECTION AURAS -->
+    <div class="section-title title-aura">✨ Auras</div>
+    <div class="status-grid" id="auras-container"></div>
 
+    <!-- SECTION CURSES -->
+    <div class="section-title title-curse">💀 Curses & Malus</div>
+    <div class="status-grid" id="curses-container"></div>
+
+    <!-- RESET -->
     <div class="reset-bar">
-        <button class="btn-reset" onclick="resetTousLesCompteurs()">Réinitialiser le combat (Reset)</button>
+        <button class="btn-reset" onclick="resetTousLesCompteurs()">Nouvelle Partie / Reset</button>
     </div>
 
     <script>
-        // ICI : Tu peux changer les noms et descriptions de tes cartes très facilement !
+        // LISTE DE TES STATUTS (Tu peux changer l'émoji par le lien d'une image plus tard si tu veux)
         const listeAuras = [
-            { id: "aura_1", name: "Aura de Protection", desc: "+1 Block par niveau avant le raid." },
-            { id: "aura_2", name: "Ferveur Divine", desc: "+1 dégât physique à toutes les compétences bleues." },
-            { id: "aura_3", name: "Bénédiction du Vent", desc: "Augmente le Speed de l'équipe de +1 par niveau." },
-            { id: "aura_4", name: "Régénération", desc: "Soigne de 1 PV au début de chaque tour de combat." }
+            { id: "aura_1", icon: "🛡️" },
+            { id: "aura_2", icon: "⚔️" },
+            { id: "aura_3", icon: "🍃" },
+            { id: "aura_4", icon: "💧" },
+            { id: "aura_5", icon: "🔥" },
+            { id: "aura_6", icon: "☀️" },
+            { id: "aura_7", icon: "👑" },
+            { id: "aura_8", icon: "👁️" }
         ];
 
         const listeCurses = [
-            { id: "curse_1", name: "Malédiction de Sang", desc: "Les héros perdent 1 PV par niveau au tour 1." },
-            { id: "curse_2", name: "Lenteur Abyssale", desc: "Réduit l'initiative de l'équipe face aux Mobs." },
-            { id: "curse_3", name: "Brûlure Magique", desc: "Les compétences magiques coûtent plus cher." }
+            { id: "curse_1", icon: "🩸" },
+            { id: "curse_2", icon: "🕸️" },
+            { id: "curse_3", icon: "🤢" },
+            { id: "curse_4", icon: "❄️" },
+            { id: "curse_5", icon: "⛓️" },
+            { id: "curse_6", icon: "☁️" },
+            { id: "curse_7", icon: "🌋" }
         ];
 
-        // Fonction pour afficher les éléments sur l'écran au démarrage
         function initialiserApplication() {
             const aurasContainer = document.getElementById('auras-container');
             const cursesContainer = document.getElementById('curses-container');
 
-            // Génération des Auras
-            listeAuras.forEach(effect => {
-                aurasContainer.innerHTML += creerCardHTML(effect, 'aura');
-            });
+            listeAuras.forEach(item => { aurasContainer.innerHTML += creerCardHTML(item, 'aura'); });
+            listeCurses.forEach(item => { cursesContainer.innerHTML += creerCardHTML(item, 'curse'); });
 
-            // Génération des Curses
-            listeCurses.forEach(effect => {
-                cursesContainer.innerHTML += creerCardHTML(effect, 'curse');
-            });
-
-            // Charger les anciennes valeurs si le téléphone s'est éteint
             chargerSauvegarde();
         }
 
-        // Modèle visuel d'une ligne de compteur
-        function creerCardHTML(effect, type) {
-            const plusBtnClass = type === 'aura' ? 'btn-plus-aura' : 'btn-plus-curse';
+        function creerCardHTML(item, type) {
+            const plusClass = type === 'aura' ? 'btn-plus-aura' : 'btn-plus-curse';
             return `
-                <div class="counter-card card-${type}">
-                    <div class="info-zone">
-                        <div class="effect-name">${effect.name}</div>
-                        <div class="effect-desc">${effect.desc}</div>
+                <div class="status-item" id="item-${item.id}">
+                    <button class="btn" onclick="modifier('${item.id}', -1)">-</button>
+                    <div class="icon-wrapper">
+                        <span class="status-icon">${item.icon}</span>
+                        <div class="status-badge" id="val-${item.id}">0</div>
                     </div>
-                    <div class="control-zone">
-                        <button class="btn btn-minus" onclick="modifier '${effect.id}', -1)">-</button>
-                        <div class="number-display" id="val-${effect.id}">0</div>
-                        <button class="btn ${plusBtnClass}" onclick="modifier('${effect.id}', 1)">+</button>
-                    </div>
+                    <button class="btn ${plusClass}" onclick="modifier('${item.id}', 1)">+</button>
                 </div>
             `;
         }
 
-        // Fonction pour calculer les +1 et -1 (bloqué entre 0 et 9)
+        // Gestion des compteurs de statuts (0 à 9)
         function modifier(id, changement) {
             const display = document.getElementById(`val-${id}`);
-            let valeurActuelle = parseInt(display.innerText);
-            let nouvelleValeur = valeurActuelle + changement;
+            const card = document.getElementById(`item-${id}`);
+            let v = parseInt(display.innerText) + changement;
 
-            // Sécurité : On bloque entre 0 et 9 réglementairement
-            if (nouvelleValeur < 0) nouvelleValeur = 0;
-            if (nouvelleValeur > 9) nouvelleValeur = 9;
+            if (v < 0) v = 0;
+            if (v > 9) v = 9;
 
-            display.innerText = nouvelleValeur;
+            display.innerText = v;
 
-            // Effet visuel si > 0
-            if (nouvelleValeur > 0) {
-                display.classList.add('active-val');
+            if (v > 0) {
+                card.classList.add('active');
             } else {
-                display.classList.remove('active-val');
+                card.classList.remove('active');
             }
 
-            // Sauvegarde automatique sur le téléphone
-            localStorage.setItem(id, nouvelleValeur);
+            localStorage.setItem(id, v);
         }
 
-        // Fonction de remise à zéro totale
+        // Gestion spécifique des PV (Pas de limite haute à 9, s'arrête à 0)
+        function modifierHP(changement) {
+            const display = document.getElementById('val-hp');
+            let v = parseInt(display.innerText) + changement;
+
+            if (v < 0) v = 0;
+
+            display.innerText = v;
+            localStorage.setItem('team_hp', v);
+        }
+
         function resetTousLesCompteurs() {
-            if (confirm("Voulez-vous remettre tous vos compteurs à 0 pour le prochain combat ?")) {
-                const allDisplays = document.querySelectorAll('.number-display');
-                allDisplays.forEach(display => {
-                    display.innerText = "0";
-                    display.classList.remove('active-val');
-                });
+            if (confirm("Remettre les PV à 20 et effacer tous les statuts ?")) {
+                document.getElementById('val-hp').innerText = "20";
+                const badges = document.querySelectorAll('.status-badge');
+                badges.forEach(b => b.innerText = "0");
+                
+                const items = document.querySelectorAll('.status-item');
+                items.forEach(i => i.classList.remove('active'));
+                
                 localStorage.clear();
             }
         }
 
-        // Charger les scores si on rafraîchit la page
         function chargerSauvegarde() {
-            const allDisplays = document.querySelectorAll('.number-display');
-            allDisplays.forEach(display => {
-                const id = display.id.replace('val-', '');
-                const sauvegarde = localStorage.getItem(id);
-                if (sauvegarde) {
-                    display.innerText = sauvegarde;
-                    if (parseInt(sauvegarde) > 0) display.classList.add('active-val');
+            // Charger les PV
+            const savedHP = localStorage.getItem('team_hp');
+            if (savedHP) document.getElementById('val-hp').innerText = savedHP;
+
+            // Charger les statuts
+            const badges = document.querySelectorAll('.status-badge');
+            badges.forEach(b => {
+                const id = b.id.replace('val-', '');
+                const savedVal = localStorage.getItem(id);
+                if (savedVal && parseInt(savedVal) > 0) {
+                    b.innerText = savedVal;
+                    document.getElementById(`item-${id}`).classList.add('active');
                 }
             });
         }
 
-        // Lancement automatique
         window.onload = initialiserApplication;
     </script>
 </body>
