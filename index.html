@@ -6,61 +6,67 @@
     <title>SYNERO - Gestionnaire de Héros</title>
     <style>
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #1a1613;
-            color: #f5f0eb;
+            font-family: 'Inter', 'Segoe UI', Roboto, sans-serif;
+            background-color: #0b0e14;
+            background-image: radial-gradient(at 50% 0%, #1a2333 0%, #0b0e14 75%);
+            color: #e2e8f0;
             margin: 0;
-            padding: 10px;
-            padding-bottom: 100px;
+            padding: 15px;
+            padding-bottom: 110px;
             user-select: none;
             -webkit-user-select: none;
         }
 
-        /* BARRE D'ONGLETS POUR LES HÉROS */
+        /* BARRE D'ONGLETS — TEXTE PLUS CLAIR POUR UNE MEILLEURE LISIBILITÉ */
         .tabs-container {
             display: flex;
-            gap: 6px;
-            margin: 10px 0 15px 0;
+            gap: 8px;
+            margin: 5px 0 20px 0;
             justify-content: center;
         }
         .tab-btn {
             flex: 1;
             max-width: 90px;
-            padding: 10px 5px;
-            background-color: #26201b;
-            border: 1px solid #362e27;
-            color: #a89986;
-            border-radius: 8px;
-            font-weight: bold;
-            font-size: 13px;
+            padding: 12px 5px;
+            background-color: rgba(30, 41, 59, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            color: #94a3b8; /* RETOUCHE : Gris plus clair (anciennement #64748b) pour un meilleur contraste inactif */
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
             cursor: pointer;
-            text-align: center;
-            transition: all 0.2s ease;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .tab-btn.active {
-            background-color: #4a1212;
-            color: #d4af37;
-            border-color: #d4af37;
-            box-shadow: 0 0 8px rgba(212, 175, 55, 0.3);
+            background-color: #00cfc1;
+            color: #0b0e14;
+            border-color: #00cfc1;
+            font-weight: 800;
+            box-shadow: 0 0 15px rgba(0, 207, 193, 0.4);
         }
 
-        /* COMPTEUR DE PV DU HÉROS SÉLECTIONNÉ */
+        /* BARRE DE PV STYLE INTERFACE DE RAID */
         .hp-section {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            margin: 5px 0 25px 0;
-            background: linear-gradient(180deg, #2c1a1a 0%, #1a1613 100%);
-            padding: 15px 10px;
-            border-radius: 12px;
-            border: 1px solid #4a1212;
+            margin: 0 0 25px 0;
+            background: rgba(15, 22, 36, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 16px 10px;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 71, 87, 0.2);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
         }
         .hp-container {
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
+            gap: 12px;
             width: 100%;
             max-width: 400px;
         }
@@ -69,165 +75,203 @@
             align-items: center;
             justify-content: center;
             gap: 6px;
-            font-size: 32px;
-            font-weight: bold;
+            font-size: 34px;
+            font-weight: 800;
             color: #ff4757;
-            text-shadow: 0 0 10px rgba(255, 71, 87, 0.3);
-            min-width: 90px;
+            min-width: 95px;
+            text-shadow: 0 0 10px rgba(255, 71, 87, 0.4);
         }
         .hp-heart {
-            font-size: 36px;
-            animation: pulse 2s infinite;
+            font-size: 30px;
+            animation: pulse 2s infinite ease-in-out;
         }
         @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
+            0% { transform: scale(1); filter: drop-shadow(0 0 2px rgba(255,71,87,0.4)); }
+            50% { transform: scale(1.08); filter: drop-shadow(0 0 10px rgba(255,71,87,0.8)); }
+            100% { transform: scale(1); filter: drop-shadow(0 0 2px rgba(255,71,87,0.4)); }
         }
 
-        /* TITRES DES SECTIONS */
+        /* TITRES DE SECTIONS */
         .section-title {
-            font-size: 16px;
-            font-weight: bold;
+            font-size: 13px;
+            font-weight: 800;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            margin: 25px 0 12px 5px;
-            padding-left: 8px;
-            border-left: 3px solid #fff;
+            letter-spacing: 1.5px;
+            margin: 30px 0 15px 5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
-        .title-aura { color: #d4af37; border-left-color: #d4af37; }
-        .title-curse { color: #a870e6; border-left-color: #a870e6; }
+        .section-title::before {
+            content: '';
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+        }
+        .title-aura { color: #f1c40f; }
+        .title-aura::before { background-color: #f1c40f; box-shadow: 0 0 8px #f1c40f; }
+        .title-curse { color: #c084fc; }
+        .title-curse::before { background-color: #c084fc; box-shadow: 0 0 8px #c084fc; }
 
-        /* GRILLE DES STATUTS COMPACTE */
+        /* GRILLE DE FLUIDE COMPACTE */
         .status-grid {
             display: flex;
             flex-wrap: wrap;
-            gap: 10px;
+            gap: 12px;
             justify-content: center;
         }
 
-        /* BLOC COMPTEUR [-] [ICONE] [+] */
+        /* CONTENEURS GÉOMÉTRIQUES — ESPACEMENT SÉCURISÉ (GAP 8px) */
         .status-item {
-            background-color: #26201b;
-            padding: 6px 8px;
-            border-radius: 10px;
+            background: rgba(20, 27, 41, 0.6);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            padding: 6px;
+            border-radius: 14px;
             display: flex;
             align-items: center;
-            gap: 6px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
-            border: 1px solid #362e27;
+            gap: 8px; /* RETOUCHE ERGONOMIE : Légèrement agrandi pour isoler les boutons tactiles */
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            transition: all 0.2s ease;
         }
 
-        /* ZONE ICONE AJUSTÉE POUR ACCUEILLIR TES IMAGES PNG */
+        /* CADRE D'ICÔNE SÉCURISÉ */
         .icon-wrapper {
             position: relative;
-            width: 46px;
-            height: 46px;
-            background-color: #1a1613;
+            width: 54px;
+            height: 54px;
+            background-color: #0b0e14;
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .status-icon {
+            max-width: 38px;
+            max-height: 38px;
+            object-fit: contain;
+        }
+
+        /* LE BADGE NUMÉRIQUE — ACCESSIBILITÉ TEXTE AMÉLIORÉE */
+        .status-badge {
+            position: absolute;
+            bottom: -7px;
+            right: -7px;
+            background: #1e293b;
+            color: #94a3b8;
+            font-size: 14px;
+            font-weight: 800;
+            width: 22px;
+            height: 22px;
             border-radius: 8px;
             display: flex;
             justify-content: center;
             align-items: center;
-            border: 1px solid #443a30;
-            overflow: visible;
-        }
-        
-        /* Ajustement de la taille de tes images de cartes */
-        .status-icon {
-            max-width: 34px;
-            max-height: 34px;
-            object-fit: contain; /* Évite de déformer ton graphisme */
-        }
-
-        /* Badge du chiffre posé sur l'icône */
-        .status-badge {
-            position: absolute;
-            bottom: -4px;
-            right: -4px;
-            background-color: #3d352e;
-            color: #a89986;
-            font-size: 12px;
-            font-weight: bold;
-            width: 18px;
-            height: 18px;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            border: 1px solid #1a1613;
+            border: 2px solid #0b0e14;
             z-index: 2;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
         
-        /* Style quand le compteur est actif (> 0) */
-        .status-item.active .icon-wrapper {
-            border-color: #55efc4;
-            box-shadow: 0 0 8px rgba(85, 239, 196, 0.2);
+        /* EFFETS ACTIFS LORSQUE LE COMPTEUR PASSE EN ACTION */
+        .status-item.active {
+            background: rgba(20, 27, 41, 0.9);
+            border-color: rgba(255, 255, 255, 0.15);
+            transform: scale(1.02);
         }
-        .status-item.active .status-badge {
-            background-color: #55efc4;
-            color: #1a1613;
+        /* Mode Aura active -> Or lumineux */
+        .status-grid[id="auras-container"] .status-item.active {
+            box-shadow: 0 0 15px rgba(241, 196, 15, 0.15);
+        }
+        .status-grid[id="auras-container"] .status-item.active .icon-wrapper { border-color: #f1c40f; }
+        .status-grid[id="auras-container"] .status-item.active .status-badge {
+            background: #f1c40f;
+            color: #0b0e14;
+            box-shadow: 0 0 8px rgba(241, 196, 15, 0.5);
+        }
+        /* Mode Curse active -> RETOUCHE CONTRASTE : Violet clair électrique + texte noir pour lisibilité maximale */
+        .status-grid[id="curses-container"] .status-item.active {
+            box-shadow: 0 0 15px rgba(192, 132, 252, 0.15);
+        }
+        .status-grid[id="curses-container"] .status-item.active .icon-wrapper { border-color: #c084fc; }
+        .status-grid[id="curses-container"] .status-item.active .status-badge {
+            background: #c084fc; /* Violet orchidée clair */
+            color: #0b0e14;       /* Texte noir contrasté (anciennement blanc sur violet foncé) */
+            box-shadow: 0 0 8px rgba(192, 132, 252, 0.5);
         }
 
-        /* BOUTONS STYLE JEU / TACTILE */
+        /* BOUTONS INTERACTIFS */
         .btn {
-            width: 34px;
-            height: 34px;
-            border-radius: 6px;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
             border: none;
             font-size: 16px;
-            font-weight: bold;
+            font-weight: 700;
             cursor: pointer;
             display: flex;
             justify-content: center;
             align-items: center;
-            color: #fff;
-            background-color: #3a322b;
+            color: #94a3b8;
+            background-color: #1e293b;
+            transition: all 0.1s ease;
         }
-        .btn:active { transform: scale(0.9); }
+        .btn:active { transform: scale(0.9); background-color: #334155; }
         
-        /* Boutons PV spécifiques */
-        .btn-hp { width: 42px; height: 42px; border-radius: 50%; font-size: 18px; }
-        .btn-minus-hp { background-color: #4a2024; color: #ff4757; }
-        .btn-plus-hp { background-color: #204a2e; color: #2ed573; }
-        .btn-5-hp { background-color: #2d3436; color: #b2bec3; font-size: 13px; }
+        /* Boutons de vie néons */
+        .btn-hp { width: 42px; height: 42px; border-radius: 12px; font-size: 18px; }
+        .btn-minus-hp { background-color: rgba(239, 68, 68, 0.15); border: 1px solid #ef4444; color: #ef4444; }
+        .btn-minus-hp:active { background-color: #ef4444; color: #fff; }
+        .btn-plus-hp { background-color: rgba(34, 197, 94, 0.15); border: 1px solid #22c55e; color: #22c55e; }
+        .btn-plus-hp:active { background-color: #22c55e; color: #fff; }
+        .btn-5-hp { background-color: #1e293b; color: #64748b; font-size: 13px; }
 
-        /* Boutons + des lignes de statuts */
-        .btn-plus-aura { background-color: #d4af37; color: #1a1613; }
-        .btn-plus-curse { background-color: #8e44ad; color: #fff; }
+        .btn-plus-aura { background-color: rgba(241, 196, 15, 0.15); border: 1px solid #f1c40f; color: #f1c40f; }
+        .btn-plus-aura:active { background-color: #f1c40f; color: #0b0e14; }
+        .btn-plus-curse { background-color: rgba(192, 132, 252, 0.15); border: 1px solid #c084fc; color: #c084fc; }
+        .btn-plus-curse:active { background-color: #c084fc; color: #0b0e14; }
 
-        /* DOUBLE BARRE DE RESET FIXE */
+        /* DOUBLE BARRE DE CONFIGURATION INFERIEURE */
         .reset-bar {
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
-            background-color: #1a1613;
-            padding: 12px;
-            box-shadow: 0 -5px 15px rgba(0,0,0,0.5);
+            background-color: rgba(11, 14, 20, 0.9);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 15px 12px;
+            box-shadow: 0 -10px 30px rgba(0,0,0,0.5);
             display: flex;
             justify-content: center;
-            gap: 10px;
+            gap: 12px;
+            border-top: 1px solid rgba(255, 255, 255, 0.03);
         }
         .btn-reset {
             flex: 1;
             max-width: 160px;
             border: none;
             padding: 12px 5px;
-            border-radius: 20px;
-            font-weight: bold;
+            border-radius: 12px;
+            font-weight: 700;
             font-size: 11px;
             cursor: pointer;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             color: white;
             text-align: center;
+            transition: opacity 0.1s;
         }
-        .btn-reset-hero { background-color: #d35400; }
-        .btn-reset-all { background-color: #c0392b; }
+        .btn-reset:active { opacity: 0.8; }
+        .btn-reset-hero { background-color: #ea580c; }
+        .btn-reset-all { background-color: #dc2626; }
     </style>
 </head>
 <body>
 
+    <!-- BARRE DE SÉLECTION DU HÉROS -->
     <div class="tabs-container">
         <button class="tab-btn active" id="tab-hero1" onclick="changerHero('hero1', 'Héro 1')">Héro 1</button>
         <button class="tab-btn" id="tab-hero2" onclick="changerHero('hero2', 'Héro 2')">Héro 2</button>
@@ -235,8 +279,9 @@
         <button class="tab-btn" id="tab-hero4" onclick="changerHero('hero4', 'Héro 4')">Héro 4</button>
     </div>
 
+    <!-- COMPTEUR DE PV DU HÉROS SÉLECTIONNÉ -->
     <div class="hp-section">
-        <div id="hp-label" style="font-size: 14px; font-weight: bold; text-transform: uppercase; color: #d4af37; margin-bottom: 8px; letter-spacing: 1px;">Héro 1</div>
+        <div id="hp-label" style="font-size: 13px; font-weight: 800; text-transform: uppercase; color: #00cfc1; margin-bottom: 8px; letter-spacing: 1px; text-shadow: 0 0 5px rgba(0,207,193,0.2);">Héro 1</div>
         <div class="hp-container">
             <button class="btn btn-hp btn-5-hp" onclick="modifierHP(-5)">-5</button>
             <button class="btn btn-hp btn-minus-hp" onclick="modifierHP(-1)">-</button>
@@ -249,12 +294,15 @@
         </div>
     </div>
 
-    <div class="section-title title-aura">✨ Auras</div>
+    <!-- SECTION AURAS -->
+    <div class="section-title title-aura">Auras</div>
     <div class="status-grid" id="auras-container"></div>
 
-    <div class="section-title title-curse">💀 Curses & Malus</div>
+    <!-- SECTION CURSES -->
+    <div class="section-title title-curse">Curses & Malus</div>
     <div class="status-grid" id="curses-container"></div>
 
+    <!-- BARRE DE REINITIALISATION DOUBLE -->
     <div class="reset-bar">
         <button class="btn-reset btn-reset-hero" onclick="resetHeroActif()">Reset ce Héros</button>
         <button class="btn-reset btn-reset-all" onclick="resetTousLesCompteurs()">Reset les 4 Héros</button>
@@ -263,7 +311,6 @@
     <script>
         let heroActif = 'hero1';
 
-        // Base de données simplifiée (Le code va chercher directement "id.png")
         const listeAuras = [
             { id: "heal" }, { id: "block" }, { id: "fury" }, { id: "sharp" }, 
             { id: "bless" }, { id: "regen" }, { id: "melee" }, { id: "range" }, 
@@ -285,7 +332,6 @@
             chargerSauvegarde();
         }
 
-        // L'astuce magique : src="${item.id}.png" charge automatiquement ton image correspondante
         function creerCardHTML(item, type) {
             const plusClass = type === 'aura' ? 'btn-plus-aura' : 'btn-plus-curse';
             return `
