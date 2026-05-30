@@ -16,7 +16,7 @@
             -webkit-user-select: none;
         }
 
-        /* COMPTEUR DE PV (TOUT EN HAUT & CENTRÉ) */
+        /* COMPTEUR DE PV (TOUT EN HAUT, AJUSTÉ AVEC LES RACCOURCIS 5) */
         .hp-section {
             display: flex;
             flex-direction: column;
@@ -24,7 +24,7 @@
             justify-content: center;
             margin: 15px 0 25px 0;
             background: linear-gradient(180deg, #2c1a1a 0%, #1a1613 100%);
-            padding: 15px;
+            padding: 15px 10px;
             border-radius: 12px;
             border: 1px solid #4a1212;
         }
@@ -32,19 +32,23 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 25px;
+            gap: 10px;
+            width: 100%;
+            max-width: 400px;
         }
         .hp-display {
             display: flex;
             align-items: center;
-            gap: 10px;
-            font-size: 36px;
+            justify-content: center;
+            gap: 6px;
+            font-size: 32px;
             font-weight: bold;
             color: #ff4757;
             text-shadow: 0 0 10px rgba(255, 71, 87, 0.3);
+            min-width: 90px;
         }
         .hp-heart {
-            font-size: 42px;
+            font-size: 36px;
             animation: pulse 2s infinite;
         }
         @keyframes pulse {
@@ -59,7 +63,7 @@
             font-weight: bold;
             text-transform: uppercase;
             letter-spacing: 1px;
-            margin: 20px 0 10px 5px;
+            margin: 25px 0 12px 5px;
             padding-left: 8px;
             border-left: 3px solid #fff;
         }
@@ -68,18 +72,16 @@
 
         /* GRILLE DES STATUTS COMPACTE */
         .status-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(100px, 1max));
             display: flex;
             flex-wrap: wrap;
-            gap: 12px;
+            gap: 10px;
             justify-content: center;
         }
 
         /* BLOC COMPTEUR MINIMALISTE [-] [ICONE] [+] */
         .status-item {
             background-color: #26201b;
-            padding: 8px;
+            padding: 6px 8px;
             border-radius: 10px;
             display: flex;
             align-items: center;
@@ -100,7 +102,6 @@
             align-items: center;
             border: 1px solid #443a30;
         }
-        /* Pour l'instant on utilise des émojis, mais tu pourras mettre des <img src="..."> */
         .status-icon {
             font-size: 24px; 
         }
@@ -122,6 +123,7 @@
             align-items: center;
             border: 1px solid #1a1613;
         }
+        
         /* Style quand le compteur est actif (> 0) */
         .status-item.active .icon-wrapper {
             border-color: #55efc4;
@@ -132,10 +134,10 @@
             color: #1a1613;
         }
 
-        /* BOUTONS STYLE MANETTE / JEU */
+        /* BOUTONS STYLE JEU / TACTILE */
         .btn {
-            width: 32px;
-            height: 32px;
+            width: 34px;
+            height: 34px;
             border-radius: 6px;
             border: none;
             font-size: 16px;
@@ -149,10 +151,13 @@
         }
         .btn:active { transform: scale(0.9); }
         
-        /* Différenciation des boutons + */
-        .btn-plus-hp { background-color: #ff4757; color: white; width: 44px; height: 44px; font-size: 20px; border-radius: 50%; }
-        .btn-minus-hp { background-color: #4a2024; color: white; width: 44px; height: 44px; font-size: 20px; border-radius: 50%; }
-        
+        /* Boutons PV spécifiques */
+        .btn-hp { width: 42px; height: 42px; border-radius: 50%; font-size: 18px; }
+        .btn-minus-hp { background-color: #4a2024; color: #ff4757; }
+        .btn-plus-hp { background-color: #204a2e; color: #2ed573; }
+        .btn-5-hp { background-color: #2d3436; color: #b2bec3; font-size: 13px; }
+
+        /* Boutons + des lignes de statuts */
         .btn-plus-aura { background-color: #d4af37; color: #1a1613; }
         .btn-plus-curse { background-color: #8e44ad; color: #fff; }
 
@@ -185,16 +190,18 @@
 </head>
 <body>
 
-    <!-- COMPTEUR DE PV DE L'ÉQUIPE -->
+    <!-- COMPTEUR DE PV DE L'ÉQUIPE (AVEC LES 4 BOUTONS DE COMMANDE) -->
     <div class="hp-section">
-        <div style="font-size: 11px; text-transform: uppercase; color: #a89986; margin-bottom: 5px; letter-spacing: 1px;">Points de Vie de l'Équipe</div>
+        <div style="font-size: 11px; text-transform: uppercase; color: #a89986; margin-bottom: 8px; letter-spacing: 1px;">Points de Vie de l'Équipe</div>
         <div class="hp-container">
-            <button class="btn btn-minus-hp" onclick="modifierHP(-1)">-</button>
+            <button class="btn btn-hp btn-5-hp" onclick="modifierHP(-5)">-5</button>
+            <button class="btn btn-hp btn-minus-hp" onclick="modifierHP(-1)">-</button>
             <div class="hp-display">
                 <span class="hp-heart">❤️</span>
                 <span id="val-hp">20</span>
             </div>
-            <button class="btn btn-plus-hp" onclick="modifierHP(1)">+</button>
+            <button class="btn btn-hp btn-plus-hp" onclick="modifierHP(1)">+</button>
+            <button class="btn btn-hp btn-5-hp" onclick="modifierHP(5)">+5</button>
         </div>
     </div>
 
@@ -206,32 +213,35 @@
     <div class="section-title title-curse">💀 Curses & Malus</div>
     <div class="status-grid" id="curses-container"></div>
 
-    <!-- RESET -->
+    <!-- BARRE DE RESET -->
     <div class="reset-bar">
         <button class="btn-reset" onclick="resetTousLesCompteurs()">Nouvelle Partie / Reset</button>
     </div>
 
     <script>
-        // LISTE DE TES STATUTS (Tu peux changer l'émoji par le lien d'une image plus tard si tu veux)
+        // LA LISTE COMPLÈTE DE VOS STATUS (ID ET IMAGES TEMPORAIRES)
+        // Astuce : Quand tes images seront prêtes, remplace l'émoji par : "<img src='mon-image.png' width='24'>"
         const listeAuras = [
-            { id: "aura_1", icon: "🛡️" },
-            { id: "aura_2", icon: "⚔️" },
-            { id: "aura_3", icon: "🍃" },
-            { id: "aura_4", icon: "💧" },
-            { id: "aura_5", icon: "🔥" },
-            { id: "aura_6", icon: "☀️" },
-            { id: "aura_7", icon: "👑" },
-            { id: "aura_8", icon: "👁️" }
+            { id: "heal", icon: "💚" },
+            { id: "block", icon: "🛡️" },
+            { id: "fury", icon: "🔥" },
+            { id: "sharp", icon: "⚔️" },
+            { id: "bless", icon: "✨" },
+            { id: "regen", icon: "🌿" },
+            { id: "melee", icon: "🤜" },
+            { id: "range", icon: "🏹" },
+            { id: "feu", icon: "💥" },
+            { id: "froid", icon: "❄️" },
+            { id: "holy", icon: "🌟" }
         ];
 
         const listeCurses = [
-            { id: "curse_1", icon: "🩸" },
-            { id: "curse_2", icon: "🕸️" },
-            { id: "curse_3", icon: "🤢" },
-            { id: "curse_4", icon: "❄️" },
-            { id: "curse_5", icon: "⛓️" },
-            { id: "curse_6", icon: "☁️" },
-            { id: "curse_7", icon: "🌋" }
+            { id: "bleed", icon: "🩸" },
+            { id: "poison", icon: "🧪" },
+            { id: "sanctify", icon: "⏳" },
+            { id: "burn", icon: "♨️" },
+            { id: "chill", icon: "🥶" },
+            { id: "mark", icon: "🎯" }
         ];
 
         function initialiserApplication() {
@@ -278,12 +288,12 @@
             localStorage.setItem(id, v);
         }
 
-        // Gestion spécifique des PV (Pas de limite haute à 9, s'arrête à 0)
+        // Gestion spécifique des PV (Prise en compte des paliers de 1 ou 5)
         function modifierHP(changement) {
             const display = document.getElementById('val-hp');
             let v = parseInt(display.innerText) + changement;
 
-            if (v < 0) v = 0;
+            if (v < 0) v = 0; // Les PV ne tombent pas en dessous de zéro
 
             display.innerText = v;
             localStorage.setItem('team_hp', v);
@@ -303,11 +313,9 @@
         }
 
         function chargerSauvegarde() {
-            // Charger les PV
             const savedHP = localStorage.getItem('team_hp');
             if (savedHP) document.getElementById('val-hp').innerText = savedHP;
 
-            // Charger les statuts
             const badges = document.querySelectorAll('.status-badge');
             badges.forEach(b => {
                 const id = b.id.replace('val-', '');
